@@ -7,6 +7,7 @@ import time
 from getopt import getopt
 import logging
 import subprocess
+from contextlib import contextmanager
 
 import daemon
 import requests
@@ -17,6 +18,10 @@ import pkgup
 
 VERSION_FILE_TMPL = (
     '{}/windows/version.txt'
+)
+
+LOCK_FILE_TMPL = (
+    '{}/backup-running.lock'
 )
 
 LOG = logging.getLogger()
@@ -51,6 +56,9 @@ def try_upgrade(url):
 
     repo = pkgup.Repository(name='drivesrvr')
     pkg = repo.package('driveclient')
+    backup_lock = dotlock.DotLock(
+        LOCK_FILE_TMPL.format('/var/cache/driveclient' if os.getuid() == 0
+                              else expanduser('~/.driveclient')))
 
     try:
         vl_txt = pkg.installed_version()
@@ -63,8 +71,20 @@ def try_upgrade(url):
     else:
         if version_triple(vl_txt) < vr:
             LOG.info('Agent version is behind: %s', vr_txt)
-            pkg.update()
+            with backup_lock:
+                LOG.info('Agent is idle; updating...')
+                with driveclient_not_running:
+                    pkg.update()
             LOG.info('Version %s upgraded', pkg.installed_nvra())
+
+
+@contextmanager
+def driveclient_not_running():
+    subprocess.call(['service', 'driveclient', 'stop'])
+    LOG.info('Agent brought down')
+    yield
+    subprocess.call(['service', 'driveclient', 'start'])
+    LOG.info('Agent brought up')
 
 
 def add_yum_repository(url):
