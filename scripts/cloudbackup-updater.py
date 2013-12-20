@@ -30,7 +30,7 @@ LOG = logging.getLogger()
 def main(interval, url):
     while 1:
         try_upgrade(url)
-        time.sleep(interval)
+        time.sleep(interval * 60)
 
 
 def try_upgrade(url):
@@ -173,7 +173,7 @@ options:
 
         with daemon.DaemonContext(
                 working_directory=os.curdir,
-                stderr=open(log_file, 'a'),
+                files_preserve=[log_fp] if log_fp is not None else [],
                 umask=63,  # 077
                 signal_map={
                     signal.SIGTERM: main_quit,
