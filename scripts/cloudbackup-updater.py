@@ -44,17 +44,21 @@ def try_upgrade(url):
     except Exception as e:
         LOG.exception(e)
 
+    if hasattr(pkgup, 'yum'):
+        get_repository = lambda: pkgup.Repository(name='drivesrvr')
+        add_repository = add_yum_repository
+
+    elif hasattr(pkgup, 'apt'):
+        get_repository = lambda: pkgup.Repository(name='serveragent')
+        add_repository = lambda u: add_apt_repository('serveragent', u)
+
     try:
-        pkgup.Repository(name='drivesrvr')
+        get_repository()
 
     except pkgup.NoSuchRepo:
-        if hasattr(pkgup, 'yum'):
-            add_yum_repository(url)
+        add_repository(url)
 
-        elif hasattr(pkgup, 'apt'):
-            add_apt_repository(url)
-
-    repo = pkgup.Repository(name='drivesrvr')
+    repo = get_repository()
     pkg = repo.package('driveclient')
     backup_lock = dotlock.DotLock(
         LOCK_FILE_TMPL.format('/var/cache/driveclient' if os.getuid() == 0
