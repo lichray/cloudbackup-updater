@@ -62,8 +62,7 @@ def try_upgrade(url):
     repo = get_repository()
     pkg = repo.package('driveclient')
     backup_lock = dotlock.DotLock(
-        LOCK_FILE_TMPL.format('/var/cache/driveclient' if os.getuid() == 0
-                              else expanduser('~/.driveclient')))
+        LOCK_FILE_TMPL.format('/var/cache/driveclient'))
 
     try:
         vl_txt = pkg.installed_version()
