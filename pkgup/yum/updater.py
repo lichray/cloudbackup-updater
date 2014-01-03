@@ -84,11 +84,12 @@ class ProgressBar(RPMBaseCallback):
             sys.stdout.write(msg)
             sys.stdout.flush()
             sys.stdout.write('\r')
+            if te_current == te_total:
+                sys.stdout.write('\n')
 
         self.lastmsg = msg
         self.lastpackage = package
 
     def scriptout(self, package, msgs):
         if msgs:
-            sys.stdout.write('\n')
             sys.stdout.write(msgs)

@@ -78,7 +78,7 @@ def try_upgrade(url):
             LOG.info('Agent version is behind: %s', vr_txt)
             with backup_lock:
                 LOG.info('Agent is idle; updating...')
-                with driveclient_not_running:
+                with driveclient_not_running():
                     pkg.update()
             LOG.info('Version %s upgraded', pkg.installed_nvra())
 
