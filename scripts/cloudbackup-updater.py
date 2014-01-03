@@ -10,6 +10,7 @@ import subprocess
 from contextlib import contextmanager
 
 import daemon
+import lockfile
 import requests
 
 import dotlock
@@ -178,7 +179,7 @@ options:
         with daemon.DaemonContext(
                 working_directory=os.curdir,
                 files_preserve=[log_fp] if log_fp is not None else [],
-                umask=63,  # 077
+                umask=077,
                 signal_map={
                     signal.SIGTERM: main_quit,
                 }):
