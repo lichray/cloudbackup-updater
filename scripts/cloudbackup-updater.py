@@ -134,7 +134,7 @@ if __name__ == '__main__':
     daemon_mode = False
     interval = 60
     cmd_name = os.path.basename(sys.argv[0])
-    log_fp = None
+    logfile = '/var/log/cloudbackup-updater.log'
     remote_prefix = 'http://agentrepo.drivesrvr.com'
 
     try:
@@ -144,7 +144,7 @@ if __name__ == '__main__':
 options:
   -d       daemon mode
   -i       interval in minutes (defaults to 60)
-  -l       path to log file (defaults to stderr)
+  -l       path to log file (defaults to /var/log/cloudbackup-updater.log)
   -r       remote repository (built-in)
   -v       verbose logging
   -h       display this help''' % cmd_name
@@ -160,7 +160,7 @@ options:
                 interval = int(v)
 
             elif k == '-l':
-                log_fp = open(v, "a")
+                logfile = v
 
             elif k == '-r':
                 remote_prefix = v
@@ -172,17 +172,18 @@ options:
     fmt = logging.Formatter('%(asctime)s [%(levelname)s]: %(message)s')
 
     if daemon_mode:
-        log_handler = logging.StreamHandler(log_fp)
-        log_handler.setFormatter(fmt)
-        LOG.addHandler(log_handler)
-
         with daemon.DaemonContext(
                 working_directory=os.curdir,
-                files_preserve=[log_fp] if log_fp is not None else [],
                 umask=077,
                 signal_map={
                     signal.SIGTERM: main_quit,
                 }):
+            log_handler = logging.RotatingFileHandler(logfile,
+                                                      maxBytes=4096,
+                                                      backupCount=5)
+            log_handler.setFormatter(fmt)
+            LOG.addHandler(log_handler)
+
             main(interval, remote_prefix)
 
     else:
