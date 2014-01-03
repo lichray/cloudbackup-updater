@@ -143,9 +143,9 @@ if __name__ == '__main__':
                 print '''%s: [options]...
 options:
   -d       daemon mode
-  -i       interval in minutes (defaults to 60)
-  -l       path to log file (defaults to /var/log/cloudbackup-updater.log)
-  -r       remote repository (built-in)
+  -i NUM   interval in minutes (defaults to 60)
+  -l PATH  path to log file (defaults to /var/log/cloudbackup-updater.log)
+  -r URI   remote repository (built-in)
   -v       verbose logging
   -h       display this help''' % cmd_name
                 sys.exit(2)
