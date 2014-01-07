@@ -45,11 +45,11 @@ def try_upgrade(url):
     except Exception as e:
         LOG.exception(e)
 
-    if hasattr(pkgup, 'yum'):
+    if pkgup.PKG_MGMT == 'yum':
         get_repository = lambda: pkgup.Repository(name='drivesrvr')
         add_repository = add_yum_repository
 
-    elif hasattr(pkgup, 'apt'):
+    elif pkgup.PKG_MGMT == 'apt':
         get_repository = lambda: pkgup.Repository(name='serveragent')
         add_repository = lambda u: add_apt_repository('serveragent', u)
 
