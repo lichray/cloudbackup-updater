@@ -70,7 +70,7 @@ def try_upgrade(url):
     except pkgup.NotInstalled:
         LOG.info('Agent not installed')
         pkg.install()
-        LOG.info('Version %s newly installed', pkg.installed_nvra())
+        LOG.info('%s is newly installed', pkg.installed_nvra())
 
     else:
         if version_triple(vl_txt) < vr:
@@ -79,7 +79,7 @@ def try_upgrade(url):
                 LOG.info('Agent is idle; updating...')
                 with driveclient_not_running():
                     pkg.update()
-            LOG.info('Version %s upgraded', pkg.installed_nvra())
+            LOG.info('%s is upgraded', pkg.installed_nvra())
 
 
 @contextmanager
