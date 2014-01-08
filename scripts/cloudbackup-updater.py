@@ -9,6 +9,7 @@ import logging
 import logging.handlers
 import subprocess
 from contextlib import contextmanager
+from string import Template
 
 import daemon
 import lockfile
@@ -173,14 +174,14 @@ def main(cmd, *args):
     try:
         for k, v in getopt(args, 'di:l:r:vh')[0]:
             if k == '-h':
-                print '''%s: [options]...
+                print Template('''$cmd_name: [options]...
 options:
   -d       daemon mode
-  -i NUM   interval in minutes (defaults to 60)
-  -l PATH  path to log file (defaults to /var/log/cloudbackup-updater.log)
-  -r URI   remote repository (built-in)
+  -i NUM   interval in minutes (defaults to $interval)
+  -l PATH  path to log file (defaults to $logfile)
+  -r URI   remote repository (build-in)
   -v       verbose logging
-  -h       display this help''' % cmd_name
+  -h       display this help''').substitute(locals())
                 sys.exit(2)
 
             elif k == '-v':
