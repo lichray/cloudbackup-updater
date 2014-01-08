@@ -25,6 +25,10 @@ LOCK_FILE_TMPL = (
     '{}/backup-running.lock'
 )
 
+KEY_FILE_TMPL = (
+    '{}/debian/agentrepo.key'
+)
+
 LOG = logging.getLogger()
 
 
@@ -101,21 +105,50 @@ def add_yum_repository(url):
     out = p.communicate()[0]
 
     if p.returncode == 0:
-        LOG.info('Adding yum repo:\n%s', out)
+        LOG.info('Adding yum repository:\n%s', out)
 
     else:
         LOG.error('Failed to add yum repo:\n%s', out)
         sys.exit(1)
 
 
+def add_apt_repository(name, url):
+    add_apt_key(KEY_FILE_TMPL.format(url))
+
+    with open('/etc/apt/sources.list.d/driveclient.list', 'w') as fp:
+        fp.write('deb [arch=amd64] {}/debian/ {} main'.format(url, name))
+        LOG.info('Adding apt repository')
+
+
+def add_apt_key(uri):
+    resp = requests.get(uri)
+
+    if not resp.ok:
+        raise RuntimeError('Failed to get keyfile %r' % uri)
+
+    p = subprocess.Popen(['apt-key', 'add', '-'],
+                         stdin=subprocess.PIPE,
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.STDOUT)
+
+    out = p.communicate(resp.content)
+
+    if p.returncode == 0:
+        LOG.info('Adding apt key')
+
+    else:
+        LOG.error('Failed to add apt key:\n%s', out)
+        sys.exit(1)
+
+
 def remote_version(url):
     remote_version_file = VERSION_FILE_TMPL.format(url)
-    req = requests.get(remote_version_file)
+    resp = requests.get(remote_version_file)
 
-    if not req.ok:
+    if not resp.ok:
         raise RuntimeError('Failed to communicate %r' % remote_version_file)
 
-    return req.content
+    return resp.content
 
 
 def version_triple(version_text):
