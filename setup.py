@@ -1,5 +1,5 @@
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 setup(
@@ -8,7 +8,7 @@ setup(
     description='Auto-updater for the Rackspace Cloud Backup agent',
     author='Zhihao Yuan',
     author_email='zhihao.yuan@rackspace.com',
-    packages=['dotlock', 'pkgup'],
+    packages=find_packages(),
     scripts=['scripts/cloudbackup-updater.py'],
     zip_safe=True,
     license='BSD',
