@@ -69,7 +69,6 @@ class Package(object):
         with self.transaction():
             self.__pkg.mark_install()
 
-
     def update(self):
         with self.transaction():
             self.__pkg.mark_upgrade()
