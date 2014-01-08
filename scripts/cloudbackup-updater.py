@@ -179,7 +179,7 @@ options:
   -d       daemon mode
   -i NUM   interval in minutes (defaults to $interval)
   -l PATH  path to log file (defaults to $logfile)
-  -r URI   remote repository (build-in)
+  -r URI   alternative remote repository
   -v       verbose logging
   -h       display this help''').substitute(locals())
                 sys.exit(2)
