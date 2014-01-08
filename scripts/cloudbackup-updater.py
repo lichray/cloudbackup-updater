@@ -6,6 +6,7 @@ import sys
 import time
 from getopt import getopt
 import logging
+import logging.handlers
 import subprocess
 from contextlib import contextmanager
 
@@ -210,9 +211,8 @@ options:
                 signal_map={
                     signal.SIGTERM: main_quit,
                 }):
-            log_handler = logging.RotatingFileHandler(logfile,
-                                                      maxBytes=4096,
-                                                      backupCount=5)
+            log_handler = logging.handlers.RotatingFileHandler(
+                logfile, maxBytes=4096, backupCount=5)
             log_handler.setFormatter(fmt)
             LOG.addHandler(log_handler)
 
