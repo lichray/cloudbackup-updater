@@ -33,7 +33,7 @@ KEY_FILE_TMPL = (
 LOG = logging.getLogger()
 
 
-def main(interval, url):
+def keep_upgraded(interval, url):
     while 1:
         try_upgrade(url)
         time.sleep(interval * 60)
@@ -163,15 +163,15 @@ def main_quit(signum=0, frame=None):
     sys.exit()
 
 
-if __name__ == '__main__':
+def main(cmd, *args):
     daemon_mode = False
     interval = 60
-    cmd_name = os.path.basename(sys.argv[0])
+    cmd_name = os.path.basename(cmd)
     logfile = '/var/log/cloudbackup-updater.log'
     remote_prefix = 'http://agentrepo.drivesrvr.com'
 
     try:
-        for k, v in getopt(sys.argv[1:], 'di:l:r:vh')[0]:
+        for k, v in getopt(args, 'di:l:r:vh')[0]:
             if k == '-h':
                 print '''%s: [options]...
 options:
@@ -216,7 +216,7 @@ options:
             log_handler.setFormatter(fmt)
             LOG.addHandler(log_handler)
 
-            main(interval, remote_prefix)
+            keep_upgraded(interval, remote_prefix)
 
     else:
         log_handler = logging.StreamHandler()
@@ -228,3 +228,7 @@ options:
 
         except KeyboardInterrupt:
             pass
+
+
+if __name__ == '__main__':
+    main(*sys.argv)
