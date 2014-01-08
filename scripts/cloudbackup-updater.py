@@ -12,6 +12,7 @@ from contextlib import contextmanager
 from string import Template
 
 import daemon
+import daemon.pidfile
 import requests
 
 import dotlock
@@ -168,6 +169,7 @@ def main(cmd, *args):
     interval = 60
     cmd_name = os.path.basename(cmd)
     logfile = '/var/log/cloudbackup-updater.log'
+    pidfile = '/var/run/cloudbackup-updater.pid'
     remote_prefix = 'http://agentrepo.drivesrvr.com'
 
     try:
@@ -178,6 +180,7 @@ options:
   -d       daemon mode
   -i NUM   interval in minutes (defaults to $interval)
   -l PATH  path to log file (defaults to $logfile)
+  -p PATH  path to pid file (defaults to $pidfile)
   -r URI   alternative remote repository
   -v       verbose logging
   -h       display this help''').substitute(locals())
@@ -195,6 +198,9 @@ options:
             elif k == '-l':
                 logfile = v
 
+            elif k == '-p':
+                pidfile = v
+
             elif k == '-r':
                 remote_prefix = v
 
@@ -207,6 +213,7 @@ options:
     if daemon_mode:
         with daemon.DaemonContext(
                 umask=077,
+                pidfile=daemon.pidfile.TimeoutPIDLockFile(pidfile),
                 signal_map={
                     signal.SIGTERM: main_quit,
                 }):
