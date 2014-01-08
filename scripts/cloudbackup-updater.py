@@ -12,7 +12,6 @@ from contextlib import contextmanager
 from string import Template
 
 import daemon
-import lockfile
 import requests
 
 import dotlock
@@ -207,7 +206,6 @@ options:
 
     if daemon_mode:
         with daemon.DaemonContext(
-                working_directory=os.curdir,
                 umask=077,
                 signal_map={
                     signal.SIGTERM: main_quit,
