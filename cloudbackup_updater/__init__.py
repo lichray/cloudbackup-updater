@@ -164,7 +164,7 @@ def main_quit(signum=0, frame=None):
     sys.exit()
 
 
-def main(cmd, *args):
+def main_exec(cmd, *args):
     daemon_mode = False
     interval = 60
     cmd_name = os.path.basename(cmd)
@@ -236,5 +236,5 @@ options:
             pass
 
 
-if __name__ == '__main__':
-    main(*sys.argv)
+def main():
+    main_exec(*sys.argv)

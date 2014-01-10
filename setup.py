@@ -9,7 +9,11 @@ setup(
     author='Zhihao Yuan',
     author_email='zhihao.yuan@rackspace.com',
     packages=find_packages(),
-    scripts=['scripts/cloudbackup-updater.py'],
+    entry_points={
+        'console_scripts': [
+            'cloudbackup-updater = cloudbackup_updater:main',
+        ],
+    },
     zip_safe=True,
     license='BSD',
     keywords=['rackspace', 'cloudbackup', 'daemon'],
