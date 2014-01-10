@@ -1,0 +1,20 @@
+Source: cloudbackup-updater
+Maintainer: Zhihao Yuan <zhihao.yuan@rackspace.com>
+Section: python
+Priority: optional
+Build-Depends: python-setuptools (>= 0.6b3), python-all (>= 2.6.6-3), debhelper (>= 7.4.3)
+Standards-Version: 3.9.4
+
+Package: python-cloudbackup-updater
+Architecture: all
+Depends: ${misc:Depends}, ${python:Depends}
+Description: Auto-updater for the Rackspace Cloud Backup agent
+ Cloud Backup Agent auto-updater operates in 2 modes:
+ .
+   1. Daemon mode (with the -d commend line option);
+   2. One-shot update (without -d).
+ .
+ In each mode, the auto-updater can add the agent repository
+ if it's not there, install the agent if not installed, and
+ update the agent if a new version is released.
+ .
