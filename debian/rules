@@ -5,6 +5,3 @@
 
 %:
 	dh $@ --with python2 --buildsystem=python_distutils
-
-override_dh_installinit:
-	dh_installinit --name=cloudbackup-updater

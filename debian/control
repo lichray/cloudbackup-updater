@@ -1,11 +1,11 @@
 Source: cloudbackup-updater
 Maintainer: Zhihao Yuan <zhihao.yuan@rackspace.com>
-Section: python
+Section: admin
 Priority: optional
 Build-Depends: python-setuptools (>= 0.6b3), python-all (>= 2.6.6-3), debhelper (>= 7.4.3)
 Standards-Version: 3.9.4
 
-Package: python-cloudbackup-updater
+Package: cloudbackup-updater
 Architecture: all
 Depends: ${misc:Depends}, ${python:Depends}
 Description: Auto-updater for the Rackspace Cloud Backup agent
