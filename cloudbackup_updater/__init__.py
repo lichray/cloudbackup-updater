@@ -173,7 +173,7 @@ def main_exec(cmd, *args):
     remote_prefix = 'http://agentrepo.drivesrvr.com'
 
     try:
-        for k, v in getopt(args, 'di:l:r:vh')[0]:
+        for k, v in getopt(args, 'di:l:p:r:vh')[0]:
             if k == '-h':
                 print Template('''$cmd_name: [options]...
 options:

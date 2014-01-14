@@ -13,14 +13,13 @@ NAME=cloudbackup-updater
 DAEMON=/usr/bin/cloudbackup-updater
 PIDFILE=/var/run/cloudbackup-updater.pid
 LOG=/var/log/cloudbackup-updater.log
-EXTRA_OPTS=
 
 . /lib/lsb/init-functions
 
 case "$1" in
 start)
         log_daemon_msg "Starting $NAME" "$NAME"
-        start-stop-daemon --start --quiet --pidfile $PIDFILE --startas $DAEMON -- -d $EXTRA_OPTS
+        start-stop-daemon --start --quiet --pidfile $PIDFILE --startas $DAEMON -- -d -p $PIDFILE -l $LOG
         log_end_msg $?
         ;;
 stop)
@@ -31,7 +30,7 @@ stop)
 force-reload|restart)
         log_daemon_msg "Restarting $NAME" "$NAME"
         start-stop-daemon --stop --retry 5 --quiet --pidfile $PIDFILE
-        start-stop-daemon --start --quiet --pidfile $PIDFILE --startas $DAEMON -- -d $EXTRA_OPTS
+        start-stop-daemon --start --quiet --pidfile $PIDFILE --startas $DAEMON -- -d -p $PIDFILE -l $LOG
         log_end_msg $?
         ;;
 status)
