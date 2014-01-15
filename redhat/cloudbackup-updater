@@ -1,0 +1,44 @@
+#!/bin/sh
+#
+# Startup script for Rackspace Cloud Backup Auto Updater
+#
+# chkconfig:   35 85 15
+# description: Rackspace Cloud Monitoring Agent
+# pidfile:     /var/run/cloudbackup-updater.pid
+
+NAME=cloudbackup-updater
+DAEMON=/usr/bin/cloudbackup-updater
+PIDFILE=/var/run/cloudbackup-updater.pid
+LOG=/var/log/cloudbackup-updater.log
+
+# Source function library.
+. /etc/init.d/functions
+
+case "$1" in
+  start)
+        echo -n "Starting $NAME: "
+        daemon --pidfile $PIDFILE $DAEMON -d -p $PIDFILE -l $LOG
+        RETVAL=$?
+        echo
+        [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$NAME
+        ;;
+  stop)
+        echo -n "Shutting down $NAME: "
+        killproc -p $PIDFILE
+        RETVAL=$?
+        echo
+        [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/$NAME
+        ;;
+  status)
+        status -p $PIDFILE
+        ;;
+  restart)
+        $0 stop
+        $0 start
+        ;;
+  *)
+        echo "Usage: $0 {start|stop|restart|status}"
+        exit 1
+esac
+
+exit 0
