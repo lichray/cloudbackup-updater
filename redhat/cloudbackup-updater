@@ -18,16 +18,12 @@ case "$1" in
   start)
         echo -n "Starting $NAME: "
         daemon --pidfile $PIDFILE $DAEMON -d -p $PIDFILE -l $LOG
-        RETVAL=$?
         echo
-        [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$NAME
         ;;
   stop)
         echo -n "Shutting down $NAME: "
         killproc -p $PIDFILE
-        RETVAL=$?
         echo
-        [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/$NAME
         ;;
   status)
         status -p $PIDFILE
