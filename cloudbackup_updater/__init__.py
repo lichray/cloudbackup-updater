@@ -23,15 +23,15 @@ import pkgup
 
 
 VERSION_FILE_TMPL = (
-    '{}/windows/version.txt'
+    '{0}/windows/version.txt'
 )
 
 LOCK_FILE_TMPL = (
-    '{}/backup-running.lock'
+    '{0}/backup-running.lock'
 )
 
 KEY_FILE_TMPL = (
-    '{}/debian/agentrepo.key'
+    '{0}/debian/agentrepo.key'
 )
 
 LOG = logging.getLogger()
@@ -104,7 +104,7 @@ def driveclient_not_running():
 def add_yum_repository(url):
     p = subprocess.Popen(['yum-config-manager',
                           '--add-repo',
-                          '{}/redhat/drivesrvr.repo'.format(url)],
+                          '{0}/redhat/drivesrvr.repo'.format(url)],
                          stdout=subprocess.PIPE,
                          stderr=subprocess.STDOUT)
 
@@ -122,7 +122,7 @@ def add_apt_repository(name, url):
     add_apt_key(KEY_FILE_TMPL.format(url))
 
     with open('/etc/apt/sources.list.d/driveclient.list', 'w') as fp:
-        fp.write('deb [arch=amd64] {}/debian/ {} main'.format(url, name))
+        fp.write('deb [arch=amd64] {0}/debian/ {1} main'.format(url, name))
         LOG.info('Adding apt repository')
 
 
