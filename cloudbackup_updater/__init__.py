@@ -12,8 +12,11 @@ from contextlib import contextmanager
 from string import Template
 
 import daemon
-import daemon.pidfile
 import requests
+try:
+    from daemon.pidfile import PIDLockFile
+except ImportError:
+    from daemon.pidlockfile import PIDLockFile
 
 import dotlock
 import pkgup
@@ -213,7 +216,7 @@ options:
     if daemon_mode:
         with daemon.DaemonContext(
                 umask=077,
-                pidfile=daemon.pidfile.TimeoutPIDLockFile(pidfile),
+                pidfile=PIDLockFile(pidfile),
                 signal_map={
                     signal.SIGTERM: main_quit,
                 }):
