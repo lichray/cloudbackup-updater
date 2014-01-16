@@ -44,8 +44,9 @@ def keep_upgraded(interval, url):
 
 
 def try_upgrade(url):
+    vr_txt = remote_version(url)
+
     try:
-        vr_txt = remote_version(url)
         vr = version_triple(vr_txt)
 
     except ValueError:
