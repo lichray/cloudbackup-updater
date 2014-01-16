@@ -13,9 +13,6 @@ Source0:        %{name}-%{version}.tar.xz
 BuildArch:      noarch
 BuildRequires:  python-devel, python-setuptools
 Requires:       python-daemon, python-requests
-Requires(post): chkconfig
-Requires(preun): chkconfig
-Requires(preun): initscripts
 
 %description
 Cloud Backup Agent auto-updater operates in 2 modes:
@@ -38,18 +35,27 @@ update the agent if a new version is released.
 
 %install
 %{__python2} setup.py install -O1 --skip-build --root %{buildroot}
-mkdir -p %{buildroot}%{_sysconfdir}/init.d
-install -m 755 redhat/%{name} %{buildroot}%{_sysconfdir}/init.d/
+install -D -m 755 redhat/%{name} %{buildroot}%{_sysconfdir}/init.d/%{name}
 
 
 %post
-/sbin/chkconfig --add %{name}
+if [ -x /usr/lib/lsb/install_initd ]; then
+  /usr/lib/lsb/install_initd /etc/init.d/%{name}
+elif [ -x /sbin/chkconfig ]; then
+  /sbin/chkconfig --add %{name}
+else
+  echo "Unable to setup init scripts"
+fi
 
 
 %preun
 if [ $1 -eq 0 ] ; then
-    /sbin/service %{name} stop >/dev/null 2>&1
+  /sbin/service %{name} stop >/dev/null 2>&1
+  if [ -x /usr/lib/lsb/remove_initd ]; then
+    /usr/lib/lsb/install_initd /etc/init.d/%{name}
+  elif [ -x /sbin/chkconfig ]; then
     /sbin/chkconfig --del %{name}
+  fi
 fi
 
 
