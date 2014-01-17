@@ -23,15 +23,15 @@ import pkgup
 
 
 VERSION_FILE_TMPL = (
-    '{0}/windows/version.txt'
+    '%s/windows/version.txt'
 )
 
 LOCK_FILE_TMPL = (
-    '{0}/backup-running.lock'
+    '%s/backup-running.lock'
 )
 
 KEY_FILE_TMPL = (
-    '{0}/debian/agentrepo.key'
+    '%s/debian/agentrepo.key'
 )
 
 LOG = logging.getLogger()
@@ -72,7 +72,7 @@ def try_upgrade(url):
     repo = get_repository()
     pkg = repo.package('driveclient')
     backup_lock = dotlock.DotLock(
-        LOCK_FILE_TMPL.format('/var/cache/driveclient'))
+        LOCK_FILE_TMPL % '/var/cache/driveclient')
 
     try:
         vl_txt = pkg.installed_version()
@@ -104,7 +104,7 @@ def driveclient_not_running():
 def add_yum_repository(url):
     p = subprocess.Popen(['yum-config-manager',
                           '--add-repo',
-                          '{0}/redhat/drivesrvr.repo'.format(url)],
+                          '%s/redhat/drivesrvr.repo' % url],
                          stdout=subprocess.PIPE,
                          stderr=subprocess.STDOUT)
 
@@ -119,10 +119,10 @@ def add_yum_repository(url):
 
 
 def add_apt_repository(name, url):
-    add_apt_key(KEY_FILE_TMPL.format(url))
+    add_apt_key(KEY_FILE_TMPL % url)
 
     with open('/etc/apt/sources.list.d/driveclient.list', 'w') as fp:
-        fp.write('deb [arch=amd64] {0}/debian/ {1} main'.format(url, name))
+        fp.write('deb [arch=amd64] %s/debian/ %s main' % (url, name))
         LOG.info('Adding apt repository')
 
 
@@ -148,7 +148,7 @@ def add_apt_key(uri):
 
 
 def remote_version(url):
-    remote_version_file = VERSION_FILE_TMPL.format(url)
+    remote_version_file = VERSION_FILE_TMPL % url
     fp = urllib2.urlopen(remote_version_file)
 
     if not 200 <= fp.getcode() < 300:
