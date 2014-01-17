@@ -18,6 +18,7 @@ try:
 except ImportError:
     from daemon.pidlockfile import PIDLockFile
 
+import ctxsoft
 import dotlock
 import pkgup
 
@@ -121,7 +122,8 @@ def add_yum_repository(url):
 def add_apt_repository(name, url):
     add_apt_key(KEY_FILE_TMPL % url)
 
-    with open('/etc/apt/sources.list.d/driveclient.list', 'w') as fp:
+    with ctxsoft.closing(open(
+        '/etc/apt/sources.list.d/driveclient.list', 'w')) as fp:
         fp.write('deb [arch=amd64] %s/debian/ %s main' % (url, name))
         LOG.info('Adding apt repository')
 
