@@ -8,11 +8,11 @@ from getopt import getopt
 import logging
 import logging.handlers
 import subprocess
+import urllib2
 from contextlib import contextmanager
 from string import Template
 
 import daemon
-import requests
 try:
     from daemon.pidfile import PIDLockFile
 except ImportError:
@@ -127,9 +127,9 @@ def add_apt_repository(name, url):
 
 
 def add_apt_key(uri):
-    resp = requests.get(uri)
+    fp = urllib2.urlopen(uri)
 
-    if not resp.ok:
+    if not 200 <= fp.getcode() < 300:
         raise RuntimeError('Failed to get keyfile %r' % uri)
 
     p = subprocess.Popen(['apt-key', 'add', '-'],
@@ -137,7 +137,7 @@ def add_apt_key(uri):
                          stdout=subprocess.PIPE,
                          stderr=subprocess.STDOUT)
 
-    out = p.communicate(resp.content)
+    out = p.communicate(fp.read())
 
     if p.returncode == 0:
         LOG.info('Adding apt key')
@@ -149,12 +149,12 @@ def add_apt_key(uri):
 
 def remote_version(url):
     remote_version_file = VERSION_FILE_TMPL.format(url)
-    resp = requests.get(remote_version_file)
+    fp = urllib2.urlopen(remote_version_file)
 
-    if not resp.ok:
+    if not 200 <= fp.getcode() < 300:
         raise RuntimeError('Failed to communicate %r' % remote_version_file)
 
-    return resp.content
+    return fp.read()
 
 
 def version_triple(version_text):
