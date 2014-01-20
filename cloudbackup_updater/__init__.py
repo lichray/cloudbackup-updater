@@ -103,20 +103,16 @@ def driveclient_not_running():
 
 
 def add_yum_repository(url):
-    p = subprocess.Popen(['yum-config-manager',
-                          '--add-repo',
-                          '%s/redhat/drivesrvr.repo' % url],
-                         stdout=subprocess.PIPE,
-                         stderr=subprocess.STDOUT)
+    uri = '%s/redhat/drivesrvr.repo' % url
+    rfp = urllib2.urlopen(uri)
 
-    out = p.communicate()[0]
+    if not 200 <= rfp.getcode() < 300:
+        raise RuntimeError('Failed to get repo file %r' % uri)
 
-    if p.returncode == 0:
-        LOG.info('Adding yum repository:\n%s', out)
-
-    else:
-        LOG.error('Failed to add yum repo:\n%s', out)
-        sys.exit(1)
+    with ctxsoft.closing(open(
+        '/etc/yum.repos.d/drivesrvr.repo', 'w')) as fp:
+        fp.write(rfp.read())
+        LOG.info('Adding yum repository')
 
 
 def add_apt_repository(name, url):
