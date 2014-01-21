@@ -47,7 +47,8 @@ class Package(object):
         return pkgs[0]
 
     def installed_nvra(self):
-        return self.__installed().nvra
+        p = self.__installed()
+        return '%s-%s-%s.%s' % (p.name, p.version, p.release, p.arch)
 
     def installed_version(self):
         return self.__installed().version
