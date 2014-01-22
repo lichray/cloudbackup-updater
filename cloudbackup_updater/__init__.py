@@ -39,7 +39,12 @@ LOG = logging.getLogger()
 
 def keep_upgraded(interval, url):
     while 1:
-        try_upgrade(url)
+        try:
+            try_upgrade(url)
+
+        except Exception, e:
+            LOG.exception(e)
+
         time.sleep(interval * 60)
 
 
