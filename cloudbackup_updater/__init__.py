@@ -9,7 +9,6 @@ import logging
 import logging.handlers
 import subprocess
 import urllib2
-from contextlib import contextmanager
 from string import Template
 
 import daemon
@@ -18,7 +17,7 @@ try:
 except ImportError:
     from daemon.pidlockfile import PIDLockFile
 
-import ctxsoft
+from ctxsoft import *
 import dotlock
 import pkgup
 
@@ -53,7 +52,7 @@ def try_upgrade(url):
     except ValueError:
         raise RuntimeError("remote version.txt is malformed: %s" % vr_txt)
 
-    except Exception as e:
+    except Exception, e:
         LOG.exception(e)
 
     if pkgup.PKG_MGMT == 'yum':
@@ -86,31 +85,37 @@ def try_upgrade(url):
     else:
         if version_triple(vl_txt) < vr:
             LOG.info('Agent version is behind: %s', vr_txt)
-            with backup_lock:
+
+            @with_(backup_lock)
+            def _as():
                 LOG.info('Agent is idle; updating...')
-                with driveclient_not_running():
+
+                @with_(driveclient_not_running())
+                def _as():
                     pkg.update()
+
             LOG.info('%s is upgraded', pkg.installed_nvra())
 
 
-@contextmanager
-def driveclient_not_running():
-    subprocess.call(['service', 'driveclient', 'stop'])
-    LOG.info('Agent brought down')
-    yield
-    subprocess.call(['service', 'driveclient', 'start'])
-    LOG.info('Agent brought up')
+class driveclient_not_running(object):
+    def __enter__(self):
+        subprocess.call(['service', 'driveclient', 'stop'])
+        LOG.info('Agent brought down')
+
+    def __exit__(self, type, value, traceback):
+        subprocess.call(['service', 'driveclient', 'start'])
+        LOG.info('Agent brought up')
 
 
 def add_yum_repository(url):
     uri = '%s/redhat/drivesrvr.repo' % url
     rfp = urllib2.urlopen(uri)
 
-    if not 200 <= rfp.getcode() < 300:
+    if not 200 <= rfp.code < 300:
         raise RuntimeError('Failed to get repo file %r' % uri)
 
-    with ctxsoft.closing(open(
-        '/etc/yum.repos.d/drivesrvr.repo', 'w')) as fp:
+    @with_(closing(open('/etc/yum.repos.d/drivesrvr.repo', 'w')))
+    def _as(fp):
         fp.write(rfp.read())
         LOG.info('Adding yum repository')
 
@@ -118,8 +123,8 @@ def add_yum_repository(url):
 def add_apt_repository(name, url):
     add_apt_key(KEY_FILE_TMPL % url)
 
-    with ctxsoft.closing(open(
-        '/etc/apt/sources.list.d/driveclient.list', 'w')) as fp:
+    @with_(closing(open('/etc/apt/sources.list.d/driveclient.list', 'w')))
+    def _as(fp):
         fp.write('deb [arch=amd64] %s/debian/ %s main' % (url, name))
         LOG.info('Adding apt repository')
 
@@ -127,7 +132,7 @@ def add_apt_repository(name, url):
 def add_apt_key(uri):
     fp = urllib2.urlopen(uri)
 
-    if not 200 <= fp.getcode() < 300:
+    if not 200 <= fp.code < 300:
         raise RuntimeError('Failed to get keyfile %r' % uri)
 
     p = subprocess.Popen(['apt-key', 'add', '-'],
@@ -149,7 +154,7 @@ def remote_version(url):
     remote_version_file = VERSION_FILE_TMPL % url
     fp = urllib2.urlopen(remote_version_file)
 
-    if not 200 <= fp.getcode() < 300:
+    if not 200 <= fp.code < 300:
         raise RuntimeError('Failed to communicate %r' % remote_version_file)
 
     return fp.read()
@@ -206,19 +211,20 @@ options:
             elif k == '-r':
                 remote_prefix = v
 
-    except Exception as e:
+    except Exception, e:
         print >> sys.stderr, '%s: %s' % (cmd_name, e)
         sys.exit(2)
 
     fmt = logging.Formatter('%(asctime)s [%(levelname)s]: %(message)s')
 
     if daemon_mode:
-        with daemon.DaemonContext(
+        @with_(daemon.DaemonContext(
                 umask=077,
                 pidfile=PIDLockFile(pidfile),
                 signal_map={
                     signal.SIGTERM: main_quit,
-                }):
+                }))
+        def _as():
             log_handler = logging.handlers.RotatingFileHandler(
                 logfile, maxBytes=4096, backupCount=5)
             log_handler.setFormatter(fmt)

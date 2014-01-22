@@ -3,11 +3,12 @@ Package installation or upgrade for RPM-based systems
 """
 
 import sys
-from contextlib import contextmanager
 
 import yum
 from yum.rpmtrans import RPMBaseCallback
 import urlgrabber
+
+from cloudbackup_updater.ctxsoft import *
 
 
 class NotInstalled(Exception):
@@ -53,19 +54,21 @@ class Package(object):
     def installed_version(self):
         return self.__installed().version
 
-    @contextmanager
-    def transaction(self):
+    def __enter__(self):
         self.__yb.repos.doSetup()
-        yield
+
+    def __exit__(self, type, value, traceback):
         self.__yb.resolveDeps()
         self.__yb.processTransaction(rpmDisplay=ProgressBar())
 
     def install(self):
-        with self.transaction():
+        @with_(self)
+        def _as():
             self.__yb.install(name=self.__name)
 
     def update(self):
-        with self.transaction():
+        @with_(self)
+        def _as():
             self.__yb.update(name=self.__name)
 
 

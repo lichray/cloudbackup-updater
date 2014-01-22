@@ -4,10 +4,11 @@ Package installation or upgrade for DEB-based systems
 
 import os
 import sys
-from contextlib import contextmanager
 
 import apt
 import apt_pkg
+
+from cloudbackup_updater.ctxsoft import *
 
 
 class NotInstalled(Exception):
@@ -59,16 +60,19 @@ class Package(object):
     def installed_version(self):
         return self.__installed().version.split('-', 1)[0]
 
-    @contextmanager
-    def transaction(self):
-        yield
+    def __enter__(self):
+        pass
+
+    def __exit__(self, type, value, traceback):
         self.__cache.commit()
         self.__sync_cache()
 
     def install(self):
-        with self.transaction():
+        @with_(self)
+        def _as():
             self.__pkg.mark_install()
 
     def update(self):
-        with self.transaction():
+        @with_(self)
+        def _as():
             self.__pkg.mark_upgrade()

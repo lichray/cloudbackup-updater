@@ -47,7 +47,7 @@ class DotLock(object):
 
             return True
 
-        except OSError as e:
+        except OSError, e:
             if e.errno == errno.EEXIST:
                 return False
 
