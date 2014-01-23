@@ -12,7 +12,6 @@ Source0:        %{name}-%{version}.tar.xz
 
 BuildArch:      noarch
 BuildRequires:  python-devel, python-setuptools
-Requires:       python-daemon
 
 %description
 Cloud Backup Agent auto-updater operates in 2 modes:

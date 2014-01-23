@@ -11,15 +11,10 @@ import subprocess
 import urllib2
 from string import Template
 
-import daemon
-try:
-    from daemon.pidfile import PIDLockFile
-except ImportError:
-    from daemon.pidlockfile import PIDLockFile
-
 from ctxsoft import *
 import dotlock
 import pkgup
+import pydaemon
 
 
 VERSION_FILE_TMPL = (
@@ -223,19 +218,20 @@ options:
     fmt = logging.Formatter('%(asctime)s [%(levelname)s]: %(message)s')
 
     if daemon_mode:
-        @with_(daemon.DaemonContext(
-                umask=077,
-                pidfile=PIDLockFile(pidfile),
-                signal_map={
-                    signal.SIGTERM: main_quit,
-                }))
+        d = pydaemon.Daemon(umask=077, pidfile=pidfile, verbose=0)
+
         def _as():
             log_handler = logging.handlers.RotatingFileHandler(
                 logfile, maxBytes=4096, backupCount=5)
             log_handler.setFormatter(fmt)
             LOG.addHandler(log_handler)
 
+            signal.signal(signal.SIGTERM, main_quit)
+
             keep_upgraded(interval, remote_prefix)
+
+        d.run = _as
+        d.start()
 
     else:
         log_handler = logging.StreamHandler()
