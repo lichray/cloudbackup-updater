@@ -7,7 +7,7 @@ Standards-Version: 3.9.4
 
 Package: cloudbackup-updater
 Architecture: all
-Depends: ${misc:Depends}, ${python:Depends}
+Depends: ${misc:Depends}, ${python:Depends}, python-apt (>= 0.7)
 Description: Auto-updater for the Rackspace Cloud Backup agent
  Cloud Backup Agent auto-updater operates in 2 modes:
  .
