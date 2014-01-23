@@ -1,3 +1,6 @@
+%{!?__python2: %define __python2 %{__python}}
+%{!?python_sitelib: %global python_sitelib %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
+%{!?python_sitearch: %global python_sitearch %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
 %{!?pyver: %define pyver %(%{__python2} -c "import sys; print sys.version[:3]")}
 
 Name:           cloudbackup-updater
@@ -13,6 +16,7 @@ Source0:        %{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python-devel, python-setuptools
 Requires:       yum
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %description
 Cloud Backup Agent auto-updater operates in 2 modes:
