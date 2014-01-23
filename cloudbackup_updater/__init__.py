@@ -71,8 +71,8 @@ def try_upgrade(url):
 
     repo = get_repository()
     pkg = repo.package('driveclient')
-    backup_lock = dotlock.DotLock(
-        LOCK_FILE_TMPL % '/var/cache/driveclient')
+    cachedir = '/var/cache/driveclient'
+    backup_lock = dotlock.DotLock(LOCK_FILE_TMPL % cachedir)
 
     try:
         vl_txt = pkg.installed_version()
@@ -86,13 +86,19 @@ def try_upgrade(url):
         if version_triple(vl_txt) < vr:
             LOG.info('Agent version is behind: %s', vr_txt)
 
-            @with_(backup_lock)
-            def _as():
-                LOG.info('Agent is idle; updating...')
-
+            def update():
                 @with_(driveclient_not_running())
                 def _as():
                     pkg.update()
+
+            if os.path.isdir(cachedir):
+                @with_(backup_lock)
+                def _as():
+                    LOG.info('Agent is idle; updating...')
+                    update()
+
+            else:
+                update()
 
             LOG.info('%s is upgraded', pkg.installed_nvra())
 
