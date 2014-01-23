@@ -8,7 +8,7 @@ Summary:        Auto-updater for the Rackspace Cloud Backup agent
 Group:          Applications/System
 License:        BSD
 URL:            https://github.com/lichray/cloudbackup-updater
-Source0:        %{name}-%{version}.tar.xz
+Source0:        %{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  python-devel, python-setuptools
