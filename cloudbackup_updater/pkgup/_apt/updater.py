@@ -72,7 +72,7 @@ class Package(object):
         def _as():
             self.__pkg.mark_install()
 
-    def update(self):
+    def update(self, to):
         @with_(self)
         def _as():
             self.__pkg.mark_upgrade()

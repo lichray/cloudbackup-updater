@@ -3,6 +3,7 @@ Package installation or upgrade for RPM-based systems
 """
 
 import sys
+import subprocess
 
 import yum
 from yum.rpmtrans import RPMBaseCallback
@@ -39,13 +40,32 @@ class Package(object):
         self.__yb = yb
         self.__name = name
 
+    def __search(self):
+        return self.__yb.rpmdb.searchNevra(name=self.__name)
+
     def __installed(self):
-        pkgs = self.__yb.rpmdb.searchNevra(name=self.__name)
+        pkgs = self.__search()
 
         if not pkgs:
             raise NotInstalled(self.__name)
 
         return pkgs[0]
+
+    def __try_cmdline_if_no_action_taken_for(self, command, version=None):
+        pkgs = self.__search()
+        if not pkgs or (version is not None and pkgs[0].version != version):
+            p = subprocess.Popen(['yum', command, "--disablerepo='*'",
+                                  '--enablerepo=' + ','.join(
+                                      map(lambda r: r.name,
+                                          self.__yb.repos.listEnabled())),
+                                  '-y', '-q', self.__name],
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.STDOUT)
+
+            out = p.communicate()[0]
+
+            if p.returncode != 0:
+                raise RuntimeError('yum command failed:\n' + out)
 
     def installed_nvra(self):
         p = self.__installed()
@@ -66,10 +86,14 @@ class Package(object):
         def _as():
             self.__yb.install(name=self.__name)
 
-    def update(self):
+        self.__try_cmdline_if_no_action_taken_for('install')
+
+    def update(self, to):
         @with_(self)
         def _as():
             self.__yb.update(name=self.__name)
+
+        self.__try_cmdline_if_no_action_taken_for('update', version=to)
 
 
 class ProgressBar(RPMBaseCallback):

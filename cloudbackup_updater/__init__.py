@@ -89,7 +89,7 @@ def try_upgrade(url):
             def update():
                 @with_(driveclient_not_running())
                 def _as():
-                    pkg.update()
+                    pkg.update(to=vr_txt)
 
             if os.path.isdir(cachedir):
                 @with_(backup_lock)
