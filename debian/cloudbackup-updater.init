@@ -19,7 +19,7 @@ LOG=/var/log/cloudbackup-updater.log
 case "$1" in
 start)
         log_daemon_msg "Starting $NAME" "$NAME"
-        start-stop-daemon --start --quiet --pidfile $PIDFILE --startas $DAEMON -- -d -p $PIDFILE -l $LOG
+        start-stop-daemon --start --quiet --pidfile $PIDFILE --startas $DAEMON -- -d -p $PIDFILE -l $LOG -v
         log_end_msg $?
         ;;
 stop)
@@ -30,7 +30,7 @@ stop)
 force-reload|restart)
         log_daemon_msg "Restarting $NAME" "$NAME"
         start-stop-daemon --stop --retry 5 --quiet --pidfile $PIDFILE
-        start-stop-daemon --start --quiet --pidfile $PIDFILE --startas $DAEMON -- -d -p $PIDFILE -l $LOG
+        start-stop-daemon --start --quiet --pidfile $PIDFILE --startas $DAEMON -- -d -p $PIDFILE -l $LOG -v
         log_end_msg $?
         ;;
 status)

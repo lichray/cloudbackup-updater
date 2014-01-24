@@ -17,7 +17,7 @@ LOG=/var/log/cloudbackup-updater.log
 case "$1" in
   start)
         echo -n "Starting $NAME: "
-        daemon --pidfile $PIDFILE $DAEMON -d -p $PIDFILE -l $LOG
+        daemon --pidfile $PIDFILE $DAEMON -d -p $PIDFILE -l $LOG -v
         echo
         ;;
   stop)
