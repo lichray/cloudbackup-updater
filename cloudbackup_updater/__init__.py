@@ -146,7 +146,7 @@ def add_apt_key(uri):
                          stdout=subprocess.PIPE,
                          stderr=subprocess.STDOUT)
 
-    out = p.communicate(fp.read())
+    out = p.communicate(fp.read())[0]
 
     if p.returncode == 0:
         LOG.info('Adding apt key')
