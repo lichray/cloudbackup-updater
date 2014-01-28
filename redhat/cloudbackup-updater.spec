@@ -1,11 +1,8 @@
 %{!?__python2: %define __python2 %{__python}}
-%{!?python_sitelib: %global python_sitelib %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
-%{!?python_sitearch: %global python_sitearch %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
-%{!?pyver: %define pyver %(%{__python2} -c "import sys; print sys.version[:3]")}
 
 Name:           cloudbackup-updater
 Version:        0.1
-Release:        1
+Release:        2
 Summary:        Auto-updater for the Rackspace Cloud Backup agent
 
 Group:          Applications/System
@@ -14,7 +11,7 @@ URL:            https://github.com/lichray/cloudbackup-updater
 Source0:        %{name}-%{version}.tar.gz
 
 BuildArch:      noarch
-BuildRequires:  python-devel, python-setuptools
+BuildRequires:  zip
 Requires:       yum
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -34,12 +31,13 @@ update the agent if a new version is released.
 
 
 %build
-%{__python2} setup.py build
+zip -r %{name}.zip cloudbackup_updater
 
 
 %install
-%{__python2} setup.py install -O1 --skip-build --root %{buildroot}
+install -D -m 644 %{name}.zip %{buildroot}%{_datadir}/%{name}/%{name}.zip
 install -D -m 755 redhat/%{name} %{buildroot}%{_sysconfdir}/init.d/%{name}
+install -D -m 755 scripts/%{name} %{buildroot}%{_bindir}/%{name}
 
 
 %post
@@ -65,10 +63,12 @@ fi
 
 %files
 %{_bindir}/%{name}
-%{python_sitelib}/cloudbackup_updater/
-%{python_sitelib}/cloudbackup_updater-%{version}-py%{pyver}.egg-info/
+%{_datadir}/%{name}/
 %config(noreplace) %{_sysconfdir}/init.d/%{name}
 
 %changelog
+* Tue Jan 28 2014 Zhihao Yuan <zhihao.yuan@rackspace.com> - 0.1-2
+- No longer install as a standard python package
+
 * Mon Jan 13 2014 Zhihao Yuan <zhihao.yuan@rackspace.com> - 0.1-1
 - Initial package
