@@ -1,3 +1,9 @@
+cloudbackup-updater (0.1-2) unstable; urgency=low
+
+  * Switch to non-standard python packaging.
+
+ -- Zhihao Yuan <zhihao.yuan@rackspace.com>  Thu, 30 Jan 2014 21:07:18 +0000
+
 cloudbackup-updater (0.1-1) unstable; urgency=low
 
   * source package automatically created by stdeb 0.6.0+git
