@@ -12,7 +12,6 @@ Source0:        %{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  zip
-Requires:       yum
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %description
@@ -41,21 +40,17 @@ install -D -m 755 scripts/%{name} %{buildroot}%{_bindir}/%{name}
 
 
 %post
-if [ -x /usr/lib/lsb/install_initd ]; then
-  /usr/lib/lsb/install_initd /etc/init.d/%{name}
-elif [ -x /sbin/chkconfig ]; then
+if [ -x /sbin/chkconfig ]; then
   /sbin/chkconfig --add %{name}
 else
-  echo "Unable to setup init scripts"
+  echo "The service does not start by default."
 fi
 
 
 %preun
 if [ $1 -eq 0 ] ; then
   /sbin/service %{name} stop >/dev/null 2>&1
-  if [ -x /usr/lib/lsb/remove_initd ]; then
-    /usr/lib/lsb/install_initd /etc/init.d/%{name}
-  elif [ -x /sbin/chkconfig ]; then
+  if [ -x /sbin/chkconfig ]; then
     /sbin/chkconfig --del %{name}
   fi
 fi
