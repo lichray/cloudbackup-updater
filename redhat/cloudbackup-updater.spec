@@ -40,16 +40,33 @@ install -D -m 755 scripts/%{name} %{buildroot}%{_bindir}/%{name}
 
 
 %post
+function can_start_service()
+{
+  local current_runlevel=`grep runlevel | awk '{print $2}'`
+  local available_runlevels=`grep '# chkconfig:' /etc/init.d/$1 | awk '{print $3}'`
+  [[ available_runlevels == *"$current_runlevel"* ]]
+}
+
 if [ -x /sbin/chkconfig ]; then
   /sbin/chkconfig --add %{name}
+
+  if can_start_service %{name}; then
+    if [ $1 -eq 1 ]; then   # install
+      /sbin/service %{name} start
+    else                    # upgrade
+      /sbin/service %{name} restart
+    fi
+  fi
+
 else
   echo "The service does not start by default."
 fi
 
 
 %preun
-if [ $1 -eq 0 ] ; then
+if [ $1 -eq 0 ]; then   # uninstall
   /sbin/service %{name} stop >/dev/null 2>&1
+
   if [ -x /sbin/chkconfig ]; then
     /sbin/chkconfig --del %{name}
   fi
