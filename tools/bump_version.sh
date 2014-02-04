@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-rel=$(git describe --tags)
+rel=$(git describe --tags | sed 's/-/./g')
 
 if command -v dch >/dev/null 2>&1; then
 	dch -v $rel-2 -m 'ad-hoc testing'

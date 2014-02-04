@@ -21,7 +21,7 @@ bz2)
 	exit 1
 esac
 
-rel=$(git describe --tags)
+rel=$(git describe --tags | sed 's/-/./g')
 path=$(printf "$path_tmpl" $rel)
 dir=$(printf "$dir_tmpl" $rel)
 
