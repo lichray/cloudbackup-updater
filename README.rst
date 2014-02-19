@@ -55,7 +55,13 @@ Installation
 
 - Redhat flavors
 
+  1. Download the latest rpm package;
+  2. ``sudo yum install cloudbackup-updater-<version>-2.noarch.rpm``
+
 - Debian flavors
+
+  1. Download the latest deb package;
+  2. ``sudo dpkg -i cloudbackup-updater_<version>-2_all.deb``
 
 
 Scenarios
