@@ -1,9 +1,24 @@
-=========================
-Cloud Backup Auto-Updater
-=========================
+===============================
+Cloud Backup Agent Auto-Updater
+===============================
 
 Overview
 ========
+
+Rackspace Cloud Backup Agent resides on a variety of different Linux
+distributions, and may expand its support to FreeBSD in a near future.  Unlike
+Windows (despite of Windows Store), these platforms all come with some form of
+"package management" systems, so that user can upgrade the backup agents
+through these systems.  However, such upgrade tasks involve user interactions,
+while the practice we provide for Windows involves no user interactions, and
+has been proven to be more user-friendly and still robust.  To delivery a more
+consistent and comprehensive user-experience package, we launch the auto-
+updater support on the Linux distributions.
+
+In addition, due to the difference between the repository support of the
+package management systems, the steps to install the agent from scratch on a
+Linux box is even more complicated.  This is also a problem which the auto-
+updater aims to solve.
 
 
 Supported Platforms
