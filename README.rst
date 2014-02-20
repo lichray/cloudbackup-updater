@@ -174,3 +174,18 @@ checking.
 
 Other Options
 =============
+
+**-r** `URI`: The remote agent repository, defaults to `http://agentrepo.drivesrvr.com`.  The local package management repositories are created according to this base URI.  Can be set to an internal address for testing.
+
+**-v**: Turn on verbose logging.
+
+**-h**: Display help messages.
+
+The following options only affect the daemon mode.  They are simply ignored
+in command line mode.
+
+**-i** `NUM`: The new version checking interval in minutes, defaults to 60 (an hour).  If `NUM` is not an integer, fail with an error.
+
+**-l** `PATH`: Path to the logging file.  The file will be created if not exist, but the directory part of `PATH` shall exists.
+
+**-p** `PATH`: Path to the pidfile, the traditional UNIX daemon lock file.  The directory part of `PATH` shall exists.
