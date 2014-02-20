@@ -150,6 +150,27 @@ ALL: The agent holds a lock file, `/var/cache/driveclient/backup-running.lock`, 
 Usage
 =====
 
+The auto-updater can be used in two ways:
+
+1. As a command line tool.  Execute ``cloudbackup-updater`` from the command
+   line without the **-d** option, then ``driveclient`` is installed or updated
+   to the latest version.
+
+2. As a daemon.  Execute ``cloudbackup-updater -d``, then ``driveclient`` is
+   installed or updated to the latest version.  The auto-updater checks for the
+   new agent version (as specified in `release/windows/version.txt` under the
+   remote agent repository) every hour after it starts and keep the agent
+   installed and updated.  The interval of the checking can be changed.  See
+   `Other Options`_.
+
+Only one ``cloudbackup-updater`` can run at the same time.  The attempt to
+start a second daemon will fail with an error.
+
+The command line ``cloudbackup-updater`` can be safely used when the daemon is
+running.  One of them will perform the actual agent upgrade.  User can use the
+command line to update the agent immediately without waiting for the next
+checking.
+
 
 Other Options
 =============
