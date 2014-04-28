@@ -131,7 +131,7 @@ def add_apt_repository(name, url):
 
     @with_(closing(open('/etc/apt/sources.list.d/driveclient.list', 'w')))
     def _as(fp):
-        fp.write('deb [arch=amd64] %s/debian/ %s main' % (url, name))
+        fp.write('deb [arch=amd64] %s/debian/ %s main\n' % (url, name))
         LOG.info('Adding apt repository')
 
 
