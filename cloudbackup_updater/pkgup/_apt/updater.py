@@ -26,7 +26,8 @@ class Repository(object):
         sl.read_main_list()
         sl.get_indexes(a)
         repos = [repo for repo in a.items
-                 if repo.desc_uri.endswith('/%s/Release.gpg' % name)]
+                 if repo.desc_uri.endswith('/%s/InRelease' % name)
+                 or repo.desc_uri.endswith('/%s/Release.gpg' % name)]
 
         if not repos:
             raise NoSuchRepo(name)
