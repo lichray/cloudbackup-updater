@@ -34,20 +34,8 @@ force-reload|restart)
         log_end_msg $?
         ;;
 status)
-        log_action_begin_msg "Checking $NAME"
-        if pidofproc -p "$PIDFILE" >/dev/null; then
-            log_action_end_msg 0 "running"
-            exit 0
-        else
-            if [ -e "$PIDFILE" ]; then
-                log_action_end_msg 1 "failed to start"
-                exit 1
-            else
-                log_action_end_msg 0 "not running"
-                exit 3
-            fi
-        fi
-         ;;
+        status_of_proc -p "$PIDFILE" "$DAEMON" "$NAME" && exit 0 || exit $?
+        ;;
 *)      log_action_msg "Usage: /etc/init.d/cloudbackup-updater {start|stop|status|restart}"
         exit 2
         ;;
