@@ -3,7 +3,7 @@
 # Startup script for Rackspace Cloud Backup Auto Updater
 #
 # chkconfig:   35 85 15
-# description: Rackspace Cloud Monitoring Agent
+# description: Rackspace Cloud Backup Auto Updater
 # pidfile:     /var/run/cloudbackup-updater.pid
 
 NAME=cloudbackup-updater
