@@ -4,6 +4,7 @@ Package installation or upgrade for DEB-based systems
 
 import os
 import sys
+import gc
 
 import apt
 import apt_pkg
@@ -33,6 +34,11 @@ class Repository(object):
             raise NoSuchRepo(name)
 
         self.__cache = apt.Cache()
+
+        # apt.Cache leaks file descriptor.  We collect the old
+        # one after a new one is created.
+        # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=745487
+        gc.collect()
 
     def package(self, name):
         self.__cache.update()
