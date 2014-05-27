@@ -5,11 +5,15 @@ Package installation or upgrade for DEB-based systems
 import os
 import sys
 import gc
+import logging
 
 import apt
 import apt_pkg
 
 from cloudbackup_updater.ctxsoft import *
+
+
+LOG = logging.getLogger()
 
 
 class NotInstalled(Exception):
@@ -41,7 +45,14 @@ class Repository(object):
         gc.collect()
 
     def package(self, name):
-        self.__cache.update()
+        try:
+            self.__cache.update()
+
+        except Exception, e:
+            # May be other repository's failure
+            LOG.exception(e)
+            LOG.info('Update continued')
+
         return Package(self.__cache, name)
 
 
