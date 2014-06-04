@@ -1,3 +1,9 @@
+cloudbackup-updater (1.0-1) unstable; urgency=low
+
+  * Update to 1.0
+
+ -- Zhihao Yuan <zhihao.yuan@rackspace.com>  Wed, 04 Jun 2014 14:49:16 +0000
+
 cloudbackup-updater (0.1-2) unstable; urgency=low
 
   * Switch to non-standard python packaging.
