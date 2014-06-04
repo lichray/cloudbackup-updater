@@ -9,6 +9,7 @@ import logging
 import logging.handlers
 import subprocess
 import urllib2
+import random
 from string import Template
 
 from ctxsoft import *
@@ -35,7 +36,7 @@ LOG = logging.getLogger()
 def keep_upgraded(interval, url):
     while 1:
         try:
-            try_upgrade(url)
+            try_upgrade(url, can_wait=True)
 
         except Exception, e:
             LOG.exception(e)
@@ -43,7 +44,7 @@ def keep_upgraded(interval, url):
         time.sleep(interval * 60)
 
 
-def try_upgrade(url):
+def try_upgrade(url, can_wait=False):
     vr_txt = remote_version(url).strip()
 
     try:
@@ -84,6 +85,10 @@ def try_upgrade(url):
 
     else:
         if version_triple(vl_txt) < vr:
+            if can_wait:
+                do_wait()
+                return try_upgrade(url, can_wait=False)
+
             LOG.info('Agent version is behind: %s', vr_txt)
 
             def update():
@@ -168,6 +173,17 @@ def remote_version(url):
 
 def version_triple(version_text):
     return map(int, version_text.split('.'))
+
+
+def do_wait():
+    # E(x) = 6, Mode(x) = 4, at ~14%, Max(x) ~20
+    # 10% ~ 2.2, 25% ~ 3.4, 50% ~ 5.3, 75% ~ 7.8, 90% ~ 10.6
+    x = random.gammavariate(3.0, 2.0)
+    if os.getenv('CLOUDBACKUP_UPDATER_DEBUG') is None:
+        time.sleep(x * 3600)
+    else:
+        LOG.debug('Wait for %.1f minutes', x)
+        time.sleep(x * 60)
 
 
 def main_quit(signum=0, frame=None):
