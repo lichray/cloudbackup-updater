@@ -120,6 +120,8 @@ If 3) is true, do nothing.
 
 Otherwise, if 4) is not true, the installed agent is updated to the latest
 version from the repository.
+The actual update may be delayed for some time if the updater is running
+as a daemon.  See `Usage`_ for details.
 
 Use the command showing the installed version to compare the agent version
 before and after the installation of the auto-updater.
@@ -137,6 +139,8 @@ Redhat: ``sudo yum downgrade driveclient``
 
 Otherwise, if 5) is not true, then stop the agent daemon, upgrade the agent,
 and start the new agent daemon.
+The actual update may be delayed for some time if the updater is running
+as a daemon.  See `Usage`_ for details.
 
 ALL: If the logging level is set to `verbose` (already set in init script. See `Other Options`_ for details), the detailed steps will be logged (defaults to `/var/log/cloudbackup-updater.log`).  System log (`/var/log/messages`) may also contains the information about how the agent daemon is stopped and started, but the info text various on different system.
 
@@ -170,6 +174,12 @@ The command line ``cloudbackup-updater`` can be safely used when the daemon is
 running.  One of them will perform the actual agent upgrade.  User can use the
 command line to update the agent immediately without waiting for the next
 checking.
+
+When running as a daemon, after the auto-updater finds out that the latest
+agent is newer than the installed one, the update may be delayed.  *50%* of
+the users are expected to get the update within 6 hours, and *90%* of the
+users are expected to get it within 11 hours.  If the environment variable
+``CLOUDBACKUP_UPDATER_DEBUG`` is set, the unit is minute rather than hour.
 
 
 Other Options
