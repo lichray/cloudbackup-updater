@@ -178,7 +178,10 @@ def version_triple(version_text):
 def do_wait():
     # E(x) = 6, Mode(x) = 4, at ~14%, Max(x) ~20
     # 10% ~ 2.2, 25% ~ 3.4, 50% ~ 5.3, 75% ~ 7.8, 90% ~ 10.6
-    x = random.gammavariate(3.0, 2.0)
+    while True:
+        x = random.gammavariate(3., 2.)
+        if x < 24.:  # CDF(24) ~ 0.9995
+            break
     if os.getenv('CLOUDBACKUP_UPDATER_DEBUG') is None:
         time.sleep(x * 3600)
     else:
