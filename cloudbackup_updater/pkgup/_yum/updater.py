@@ -4,12 +4,16 @@ Package installation or upgrade for RPM-based systems
 
 import sys
 import subprocess
+import logging
 
 import yum
 from yum.rpmtrans import RPMBaseCallback
 import urlgrabber
 
 from cloudbackup_updater.ctxsoft import *
+
+
+LOG = logging.getLogger()
 
 
 class NotInstalled(Exception):
@@ -20,9 +24,14 @@ class NoSuchRepo(Exception):
     pass
 
 
+class GPGKeyTrustedYumBase(yum.YumBase):
+    def _askForGPGKeyImport(self, po, userid, hexkeyid):
+        return True
+
+
 class Repository(object):
     def __init__(self, name):
-        self.__yb = yum.YumBase()
+        self.__yb = GPGKeyTrustedYumBase()
         self.__yb.repos.disableRepo('*')
         repos = self.__yb.repos.findRepos(name)
 
@@ -54,6 +63,8 @@ class Package(object):
     def __try_cmdline_if_no_action_taken_for(self, command, version=None):
         pkgs = self.__search()
         if not pkgs or (version is not None and pkgs[0].version != version):
+            LOG.debug('Try command line')
+
             p = subprocess.Popen(['yum', command, "--disablerepo='*'",
                                   '--enablerepo=' + ','.join(
                                       map(lambda r: r.name,
@@ -82,16 +93,24 @@ class Package(object):
         self.__yb.processTransaction(rpmDisplay=ProgressBar())
 
     def install(self):
-        @with_(self)
-        def _as():
-            self.__yb.install(name=self.__name)
+        try:
+            @with_(self)
+            def _as():
+                self.__yb.install(name=self.__name)
+
+        except yum.Errors.YumBaseError, e:
+            LOG.exception(e)
 
         self.__try_cmdline_if_no_action_taken_for('install')
 
     def update(self, to):
-        @with_(self)
-        def _as():
-            self.__yb.update(name=self.__name)
+        try:
+            @with_(self)
+            def _as():
+                self.__yb.update(name=self.__name)
+
+        except yum.Errors.YumBaseError, e:
+            LOG.exception(e)
 
         self.__try_cmdline_if_no_action_taken_for('update', version=to)
 
