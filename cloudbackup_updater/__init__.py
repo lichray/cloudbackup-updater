@@ -19,7 +19,7 @@ import pydaemon
 
 
 VERSION_FILE_TMPL = (
-    '%s/windows/version.txt'
+    '%s/version.txt'
 )
 
 LOCK_FILE_TMPL = (
