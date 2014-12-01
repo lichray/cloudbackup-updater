@@ -65,12 +65,12 @@ def try_upgrade(url, can_wait=False):
         add_repository = lambda u: add_apt_repository('serveragent', u)
 
     try:
-        get_repository()
+        repo = get_repository()
 
     except pkgup.NoSuchRepo:
         add_repository(url)
+        repo = get_repository()
 
-    repo = get_repository()
     pkg = repo.package('driveclient')
     cachedir = '/var/cache/driveclient'
     backup_lock = dotlock.DotLock(LOCK_FILE_TMPL % cachedir)
