@@ -35,16 +35,36 @@ LOG = logging.getLogger()
 
 def keep_upgraded(interval, url):
     while 1:
-        try:
-            try_upgrade(url, can_wait=True)
-
-        except Exception, e:
-            LOG.exception(e)
+        if run_in_process(try_upgrade, url, return_to_wait=True):
+            do_wait()
+            run_in_process(try_upgrade, url)
 
         time.sleep(interval * 60)
 
 
-def try_upgrade(url, can_wait=False):
+def run_in_process(f, *args, **kwargs):
+    try:
+        pid = os.fork()
+
+        if pid == 0:
+            try:
+                os._exit(f(*args, **kwargs))
+
+            except Exception, e:
+                LOG.exception(e)
+                os._exit(0)
+
+        else:
+            _, status = os.waitpid(pid, 0)
+
+            if os.WIFEXITED(status):
+                return os.WEXITSTATUS(status)
+
+    except OSError, e:
+        LOG.exception(e)
+
+
+def try_upgrade(url, return_to_wait=False):
     vr_txt = remote_version(url).strip()
 
     try:
@@ -85,9 +105,8 @@ def try_upgrade(url, can_wait=False):
 
     else:
         if version_triple(vl_txt) < vr:
-            if can_wait:
-                do_wait()
-                return try_upgrade(url, can_wait=False)
+            if return_to_wait:
+                return 1
 
             LOG.info('Agent version is behind: %s', vr_txt)
 
@@ -106,6 +125,8 @@ def try_upgrade(url, can_wait=False):
                 update()
 
             LOG.info('%s is upgraded', pkg.installed_nvra())
+
+    return 0
 
 
 class driveclient_not_running(object):
