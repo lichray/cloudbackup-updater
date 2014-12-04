@@ -24,6 +24,10 @@ class NoSuchRepo(Exception):
     pass
 
 
+def _broken_yum():
+    return yum.__version_info__ < (3, 2, 29)
+
+
 class GPGKeyTrustedYumBase(yum.YumBase):
     def _askForGPGKeyImport(self, po, userid, hexkeyid):
         return True
@@ -60,10 +64,8 @@ class Package(object):
 
         return pkgs[0]
 
-    def __try_cmdline_if_no_action_taken_for(self, command, version=None):
-        pkgs = self.__search()
-        if not pkgs or (version is not None and pkgs[0].version != version):
-            LOG.debug('Try command line')
+    def __run_cmdline(self, command, version=None):
+            LOG.debug('Running command line')
 
             p = subprocess.Popen(['yum', command, "--disablerepo='*'",
                                   '--enablerepo=' + ','.join(
@@ -93,26 +95,22 @@ class Package(object):
         self.__yb.processTransaction(rpmDisplay=ProgressBar())
 
     def install(self):
-        try:
+        if not _broken_yum():
             @with_(self)
             def _as():
                 self.__yb.install(name=self.__name)
 
-        except yum.Errors.YumBaseError, e:
-            LOG.exception(e)
-
-        self.__try_cmdline_if_no_action_taken_for('install')
+        else:
+            self.__run_cmdline('install')
 
     def update(self, to):
-        try:
+        if not _broken_yum():
             @with_(self)
             def _as():
                 self.__yb.update(name=self.__name)
 
-        except yum.Errors.YumBaseError, e:
-            LOG.exception(e)
-
-        self.__try_cmdline_if_no_action_taken_for('update', version=to)
+        else:
+            self.__run_cmdline('update', version=to)
 
 
 class ProgressBar(RPMBaseCallback):
