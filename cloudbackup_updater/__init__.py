@@ -47,12 +47,16 @@ def run_in_process(f, *args, **kwargs):
         pid = os.fork()
 
         if pid == 0:
+            st = 0
             try:
-                os._exit(f(*args, **kwargs))
+                try:
+                    st = f(*args, **kwargs)
 
-            except Exception, e:
-                LOG.exception(e)
-                os._exit(0)
+                except Exception, e:
+                    LOG.exception(e)
+
+            finally:
+                sys.exit(st)
 
         else:
             _, status = os.waitpid(pid, 0)
