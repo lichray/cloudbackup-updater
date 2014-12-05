@@ -44,6 +44,7 @@ def keep_upgraded(interval, url):
 
 def run_in_process(f, *args, **kwargs):
     try:
+        ef = move_exitfunc()
         pid = os.fork()
 
         if pid == 0:
@@ -59,6 +60,7 @@ def run_in_process(f, *args, **kwargs):
                 sys.exit(st)
 
         else:
+            set_exitfunc(ef)
             _, status = os.waitpid(pid, 0)
 
             if os.WIFEXITED(status):
@@ -66,6 +68,22 @@ def run_in_process(f, *args, **kwargs):
 
     except OSError, e:
         LOG.exception(e)
+
+
+def move_exitfunc():
+    try:
+        f = sys.exitfunc
+        del sys.exitfunc
+
+        return f
+
+    except AttributeError:
+        return None
+
+
+def set_exitfunc(f):
+    if f is not None:
+        sys.exitfunc = f
 
 
 def try_upgrade(url, return_to_wait=False):
