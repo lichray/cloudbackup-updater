@@ -1,7 +1,7 @@
 %{!?__python2: %define __python2 %{__python}}
 
 Name:           cloudbackup-updater
-Version:        1.1
+Version:        1.2
 Release:        1
 Summary:        Auto-updater for the Rackspace Cloud Backup agent
 
@@ -79,6 +79,9 @@ fi
 %config(noreplace) %{_sysconfdir}/init.d/%{name}
 
 %changelog
+* Thu Dec  8 2014 Zhihao Yuan <zhihao.yuan@rackspace.com> - 1.2-1
+- Update to 1.2
+
 * Thu Oct  2 2014 Zhihao Yuan <zhihao.yuan@rackspace.com> - 1.1-1
 - Update to 1.1
 

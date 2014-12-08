@@ -8,7 +8,7 @@ def read(fname):
 
 setup(
     name='cloudbackup-updater',
-    version='1.1',
+    version='1.2',
     description='Auto-updater for the Rackspace Cloud Backup agent',
     author='Zhihao Yuan',
     author_email='zhihao.yuan@rackspace.com',

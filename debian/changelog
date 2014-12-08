@@ -1,3 +1,9 @@
+cloudbackup-updater (1.2-1) unstable; urgency=low
+
+  * Update to 1.2
+
+ -- Zhihao Yuan <zhihao.yuan@rackspace.com>  Mon, 08 Dec 2014 20:32:53 +0000
+
 cloudbackup-updater (1.1-1) unstable; urgency=low
 
   * Update to 1.1
