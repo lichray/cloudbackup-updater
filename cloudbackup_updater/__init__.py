@@ -14,6 +14,7 @@ from string import Template
 
 from ctxsoft import *
 import dotlock
+import lockf
 import pkgup
 import pydaemon
 
@@ -24,6 +25,10 @@ VERSION_FILE_TMPL = (
 
 LOCK_FILE_TMPL = (
     '%s/backup-running.lock'
+)
+
+STATE_FILE_TMPL = (
+    '%s/auto-upgradable.state'
 )
 
 KEY_FILE_TMPL = (
@@ -116,6 +121,8 @@ def try_upgrade(url, return_to_wait=False):
     pkg = repo.package('driveclient')
     cachedir = '/var/cache/driveclient'
     backup_lock = dotlock.DotLock(LOCK_FILE_TMPL % cachedir)
+    # rely on __del__ to close the file
+    upgrade_state = lockf.Lockf(open(STATE_FILE_TMPL % cachedir, "w"))
 
     try:
         vl_txt = pkg.installed_version()
@@ -139,6 +146,7 @@ def try_upgrade(url, return_to_wait=False):
 
             if os.path.isdir(cachedir):
                 @with_(backup_lock)
+                @with_(upgrade_state)
                 def _as():
                     LOG.info('Agent is idle; updating...')
                     update()
